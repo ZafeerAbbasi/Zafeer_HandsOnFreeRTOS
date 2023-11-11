@@ -1,0 +1,49 @@
+{
+	"folders": [
+		{
+			"path": "00_ProjectTemplate"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"stdint.h": "c",
+			"stm32h7xx_hal.h": "c",
+			"stm32h743xx.h": "c",
+			"main.h": "c",
+			"usr01_uart.h": "c",
+			"usr02_adc.h": "c",
+			"lwip.h": "c",
+			"ethernetif.h": "c",
+			"stm32h7xx_it.h": "c",
+			"opt.h": "c",
+			"stm32f7xx_hal.h": "c",
+			"stm32f7xx.h": "c",
+			"stm32f746xx.h": "c",
+			"dhcp.h": "c",
+			"mem.h": "c",
+			"usr00_led.h": "c",
+			"timeouts.h": "c",
+			"debug.h": "c",
+			"lwipopts.h": "c",
+			"ethip6.h": "c",
+			"sys.h": "c",
+			"etharp.h": "c",
+			"memp.h": "c",
+			"httpd.h": "c",
+			"usr05_cgi_process.h": "c",
+			"app_bluenrg.h": "c",
+			"link_layer.h": "c",
+			"bluenrg_conf.h": "c",
+			"gpio.h": "c",
+			"usart.h": "c",
+			"hci_tl_interface.h": "c",
+			"hci.h": "c",
+			"liquidcrystal_i2c.h": "c",
+			"lcd.h": "c",
+			"adc.h": "c",
+			"task.h": "c",
+			"freertos.h": "c"
+		},
+		"git.ignoreLimitWarning": true
+	}
+}
