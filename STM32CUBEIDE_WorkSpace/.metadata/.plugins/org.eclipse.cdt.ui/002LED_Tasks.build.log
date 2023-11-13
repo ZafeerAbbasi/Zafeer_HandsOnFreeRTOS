@@ -1,0 +1,10 @@
+03:18:39 **** Build of configuration Debug for project 002LED_Tasks ****
+make -j12 all 
+arm-none-eabi-size   002LED_Tasks.elf 
+   text	   data	    bss	    dec	    hex	filename
+   6396	     20	   1572	   7988	   1f34	002LED_Tasks.elf
+Finished building: default.size.stdout
+ 
+
+03:18:40 Build Finished. 0 errors, 0 warnings. (took 1s.286ms)
+
