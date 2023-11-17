@@ -1,0 +1,59 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "002LED_Tasks",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "002LED_Tasks::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-002LED_Tasks-Debug-6a1a67e52a626b0455b0.json",
+					"name" : "002LED_Tasks",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/zafee/Documents/GitHub/Zafeer_HandsOnFreeRTOS/STM32CUBEIDE_WorkSpace/002LED_Tasks/build/debug/build",
+		"source" : "C:/Users/zafee/Documents/GitHub/Zafeer_HandsOnFreeRTOS/STM32CUBEIDE_WorkSpace/002LED_Tasks"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 2
+	}
+}

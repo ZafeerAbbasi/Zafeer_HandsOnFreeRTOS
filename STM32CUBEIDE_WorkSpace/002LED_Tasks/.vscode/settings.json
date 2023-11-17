@@ -1,5 +1,7 @@
 {
     "files.associations": {
         "freertos.h": "c"
-    }
+    },
+    "breadcrumbs.symbolSortOrder": "type",
+    "cmake.configureOnOpen": false
 }

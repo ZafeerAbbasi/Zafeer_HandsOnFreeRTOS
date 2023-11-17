@@ -16,7 +16,8 @@
             "compilerPath": "C:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10/bin/arm-none-eabi-gcc.exe",
             "cStandard": "gnu11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "windows-gcc-arm"
+            "intelliSenseMode": "windows-gcc-arm",
+            "configurationProvider": "ms-vscode.cmake-tools"
         },
         {
             "name": "Embedded",

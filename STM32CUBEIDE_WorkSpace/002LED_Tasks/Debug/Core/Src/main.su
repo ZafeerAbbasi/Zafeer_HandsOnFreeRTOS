@@ -1,4 +1,8 @@
-../Core/Src/main.c:64:5:main	8	static
-../Core/Src/main.c:107:6:SystemClock_Config	88	static
-../Core/Src/main.c:154:13:MX_GPIO_Init	56	static
-../Core/Src/main.c:299:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:75:5:main	48	static,ignoring_inline_asm
+../Core/Src/main.c:143:6:SystemClock_Config	88	static
+../Core/Src/main.c:189:13:MX_GPIO_Init	56	static
+../Core/Src/main.c:328:13:led_GreenHandler	16	static
+../Core/Src/main.c:339:13:led_OrangeHandler	16	static
+../Core/Src/main.c:349:13:led_RedHandler	16	static
+../Core/Src/main.c:369:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/main.c:386:6:Error_Handler	4	static,ignoring_inline_asm

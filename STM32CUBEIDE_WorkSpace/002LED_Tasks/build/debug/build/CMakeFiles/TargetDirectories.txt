@@ -1,0 +1,3 @@
+C:/Users/zafee/Documents/GitHub/Zafeer_HandsOnFreeRTOS/STM32CUBEIDE_WorkSpace/002LED_Tasks/build/debug/build/CMakeFiles/002LED_Tasks.dir
+C:/Users/zafee/Documents/GitHub/Zafeer_HandsOnFreeRTOS/STM32CUBEIDE_WorkSpace/002LED_Tasks/build/debug/build/CMakeFiles/edit_cache.dir
+C:/Users/zafee/Documents/GitHub/Zafeer_HandsOnFreeRTOS/STM32CUBEIDE_WorkSpace/002LED_Tasks/build/debug/build/CMakeFiles/rebuild_cache.dir
