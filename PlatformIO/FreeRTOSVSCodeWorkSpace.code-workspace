@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "04_PFIO_LEDBlockTasks_vTaskDelayUntil"
+			"path": "05_PFIO_LEDTasks_xTaskNotify"
 		}
 	],
 	"settings": {
@@ -42,7 +42,8 @@
 			"lcd.h": "c",
 			"adc.h": "c",
 			"task.h": "c",
-			"freertos.h": "c"
+			"freertos.h": "c",
+			"segger_sysview_freertos.h": "c"
 		},
 		"git.ignoreLimitWarning": true
 	}
