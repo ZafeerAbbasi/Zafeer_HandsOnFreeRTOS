@@ -58,7 +58,8 @@ static void MX_GPIO_Init(void);
 static void led_GreenHandler( void *params );
 static void led_OrangeHandler( void *params );
 static void led_RedHandler( void *params );
-static void btn_ButtonHandler( void *params );
+// static void btn_ButtonHandler( void *params );
+void btn_ButtonInterruptHandler( void );
 
 extern void SEGGER_UART_init( uint32_t );
 
@@ -73,6 +74,7 @@ TaskHandle_t tsk_zLEDRedTskHdl;
 TaskHandle_t tsk_zBtnTskHdl;
 
 TaskHandle_t volatile tsk_zNxtTskToDeleteHdl = NULL;
+BaseType_t pulPreviousNotificationValue = 0;
 
 /* USER CODE END 0 */
 
@@ -124,8 +126,8 @@ int main(void)
   configASSERT( status == pdPASS );
   status = xTaskCreate( led_OrangeHandler, "LED Orange Handler", 200, NULL, 2, &tsk_zLEDOrangeTskHdl );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( btn_ButtonHandler, "Button Task", 200, NULL, 4, &tsk_zBtnTskHdl );
-  configASSERT( status == pdPASS );
+  // status = xTaskCreate( btn_ButtonHandler, "Button Task", 200, NULL, 4, &tsk_zBtnTskHdl );
+  // configASSERT( status == pdPASS );
 
   /*Update Next Task To Be Deleted Handle*/
   tsk_zNxtTskToDeleteHdl = tsk_zLEDGreenTskHdl;
@@ -244,7 +246,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
@@ -329,35 +331,57 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(MEMS_INT2_GPIO_Port, &GPIO_InitStruct);
 
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 6, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
 
-static void btn_ButtonHandler( void *params )
+/*----------Interrupt Handlers----------------------------------------------------*/
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  GPIO_PinState isBtnPressed  = 0;
-  GPIO_PinState prevBtnVal    = 0;
-
-  while( 1 )
-  {
-    isBtnPressed = HAL_GPIO_ReadPin( B1_GPIO_Port, B1_Pin );
-
-    if( isBtnPressed == GPIO_PIN_SET )
-    {
-      /*If button is pressed and held, do not count as multiple presses*/
-      if( prevBtnVal != GPIO_PIN_SET )
-      {
-        xTaskNotify( tsk_zNxtTskToDeleteHdl, 0, eNoAction );
-      }
-    }
-
-    /*Update Previous Btn Value and Block for 10ms*/
-    prevBtnVal = isBtnPressed;
-    vTaskDelay( pdMS_TO_TICKS( 10 ) );
-  }
+  btn_ButtonInterruptHandler( );
 }
+
+/*----------User Functions--------------------------------------------------------*/
+
+void btn_ButtonInterruptHandler( void )
+{
+  /*SEGGER Trace and ISR Notification*/
+  traceISR_ENTER( );
+  xTaskNotifyFromISR( tsk_zNxtTskToDeleteHdl, 0, eNoAction, &pulPreviousNotificationValue );
+  traceISR_EXIT( );
+  portYIELD_FROM_ISR( pulPreviousNotificationValue );
+}
+
+// static void btn_ButtonHandler( void *params )
+// {
+//   GPIO_PinState isBtnPressed  = 0;
+//   GPIO_PinState prevBtnVal    = 0;
+
+//   while( 1 )
+//   {
+//     isBtnPressed = HAL_GPIO_ReadPin( B1_GPIO_Port, B1_Pin );
+
+//     if( isBtnPressed == GPIO_PIN_SET )
+//     {
+//       /*If button is pressed and held, do not count as multiple presses*/
+//       if( prevBtnVal != GPIO_PIN_SET )
+//       {
+//         xTaskNotify( tsk_zNxtTskToDeleteHdl, 0, eNoAction );
+//       }
+//     }
+
+//     /*Update Previous Btn Value and Block for 10ms*/
+//     prevBtnVal = isBtnPressed;
+//     vTaskDelay( pdMS_TO_TICKS( 10 ) );
+//   }
+// }
 
 static void led_GreenHandler( void *params )
 {
@@ -374,12 +398,12 @@ static void led_GreenHandler( void *params )
     /*If Notified then Update next handle to delete, set LED and delete itself*/
     if( isNotified == pdTRUE )
     {
-      vTaskSuspendAll( );
+      taskENTER_CRITICAL( );
       tsk_zNxtTskToDeleteHdl = tsk_zLEDOrangeTskHdl;
-      xTaskResumeAll( );
 
       SEGGER_SYSVIEW_PrintfTarget( "Deleting LED Green Task");
       HAL_GPIO_WritePin( LED_GREEN_PORT, LED_GREEN_PIN, GPIO_PIN_SET );
+      taskEXIT_CRITICAL( );
       vTaskDelete( NULL );
     }
   }
@@ -399,12 +423,12 @@ static void led_OrangeHandler( void *params )
     /*If Notified then Update next handle to delete, set LED and delete itself*/
     if( isNotified == pdTRUE )
     {
-      vTaskSuspendAll( );
+      taskENTER_CRITICAL( );
       tsk_zNxtTskToDeleteHdl = tsk_zLEDRedTskHdl;
-      xTaskResumeAll( );
 
       SEGGER_SYSVIEW_PrintfTarget( "Deleting Orange Task" );
       HAL_GPIO_WritePin( LED_ORANGE_PORT, LED_ORANGE_PIN, GPIO_PIN_SET );
+      taskEXIT_CRITICAL( );
       vTaskDelete( NULL );
     }
   }
@@ -424,12 +448,12 @@ static void led_RedHandler( void *params )
     /*If Notified then Update next handle to delete, set LED and delete itself and btn task*/
     if( isNotified == pdTRUE )
     {
-      vTaskSuspendAll( );
+      taskENTER_CRITICAL( );
       tsk_zNxtTskToDeleteHdl = NULL;
-      xTaskResumeAll( );
 
       SEGGER_SYSVIEW_PrintfTarget( "Deleting Red Task" );
       HAL_GPIO_WritePin( LED_RED_PORT, LED_RED_PIN, GPIO_PIN_SET );
+      taskEXIT_CRITICAL( );
       vTaskDelete( NULL );
       vTaskDelete( tsk_zBtnTskHdl );
     }

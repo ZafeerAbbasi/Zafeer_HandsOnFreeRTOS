@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "06_PFIO_LEDTasks_BtnISR"
+			"path": "08_PFIO_IdleHookPowerSaving"
 		}
 	],
 	"settings": {
@@ -43,7 +43,8 @@
 			"adc.h": "c",
 			"task.h": "c",
 			"freertos.h": "c",
-			"segger_sysview_freertos.h": "c"
+			"segger_sysview_freertos.h": "c",
+			"cpu_utils.h": "c"
 		},
 		"git.ignoreLimitWarning": true
 	}
