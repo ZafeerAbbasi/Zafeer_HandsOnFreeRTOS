@@ -136,6 +136,99 @@ int main(void)
   /* USER CODE END 3 */
 }
 
+/* USER CODE BEGIN 4 */
+
+void vApplicationIdleHook( void )
+{
+  HAL_PWR_EnterSLEEPMode( PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI );
+}
+
+static void led_GreenHandler( void *params )
+{
+  while( 1 )
+  {
+    SEGGER_SYSVIEW_PrintfTarget( "Toggling Green LED");
+    HAL_GPIO_TogglePin( GPIOD, LED_GREEN_PIN );
+    vTaskDelay( pdMS_TO_TICKS( 1000 ) );
+     
+  }
+}
+
+static void led_OrangeHandler( void *params )
+{
+  while( 1 )
+  {
+    SEGGER_SYSVIEW_PrintfTarget( "Toggling Orange LED" );
+    HAL_GPIO_TogglePin( GPIOD, LED_ORANGE_PIN );
+    vTaskDelay( pdMS_TO_TICKS( 800 ) );
+  }
+}
+
+static void led_RedHandler( void *params )
+{
+  while( 1 )
+  {
+    SEGGER_SYSVIEW_PrintfTarget( "Toggling Red LED" );
+    HAL_GPIO_TogglePin( GPIOD, LED_RED_PIN );
+    vTaskDelay( pdMS_TO_TICKS( 400 ) );
+  }
+}
+
+/* USER CODE END 4 */
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM6 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM6) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
+}
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */
+
 /**
   * @brief System Clock Configuration
   * @retval None
@@ -322,96 +415,3 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
-
-/* USER CODE BEGIN 4 */
-
-void vApplicationIdleHook( void )
-{
-  
-}
-
-static void led_GreenHandler( void *params )
-{
-  while( 1 )
-  {
-    SEGGER_SYSVIEW_PrintfTarget( "Toggling Green LED");
-    HAL_GPIO_TogglePin( GPIOD, LED_GREEN_PIN );
-    vTaskDelay( pdMS_TO_TICKS( 1000 ) );
-     
-  }
-}
-
-static void led_OrangeHandler( void *params )
-{
-  while( 1 )
-  {
-    SEGGER_SYSVIEW_PrintfTarget( "Toggling Orange LED" );
-    HAL_GPIO_TogglePin( GPIOD, LED_ORANGE_PIN );
-    vTaskDelay( pdMS_TO_TICKS( 800 ) );
-  }
-}
-
-static void led_RedHandler( void *params )
-{
-  while( 1 )
-  {
-    SEGGER_SYSVIEW_PrintfTarget( "Toggling Red LED" );
-    HAL_GPIO_TogglePin( GPIOD, LED_RED_PIN );
-    vTaskDelay( pdMS_TO_TICKS( 400 ) );
-  }
-}
-
-/* USER CODE END 4 */
-
-/**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM6 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  /* USER CODE BEGIN Callback 0 */
-
-  /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM6) {
-    HAL_IncTick();
-  }
-  /* USER CODE BEGIN Callback 1 */
-
-  /* USER CODE END Callback 1 */
-}
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
-}
-
-#ifdef  USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */
