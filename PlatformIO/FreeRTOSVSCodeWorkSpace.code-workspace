@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "08_PFIO_IdleHookPowerSaving"
+			"path": "09_PFIO_QueuesAndTimers"
 		}
 	],
 	"settings": {
