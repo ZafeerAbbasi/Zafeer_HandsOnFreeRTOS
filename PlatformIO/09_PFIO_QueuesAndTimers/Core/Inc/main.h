@@ -61,6 +61,13 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
+void usrtask_MenuTask( void *param );
+void usrtask_CmdHandlerTask( void *param );
+void usrtask_PrintTask( void *param );
+void usrtask_LEDTask( void *param );
+void usrtask_RTCTask( void *param );
+
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

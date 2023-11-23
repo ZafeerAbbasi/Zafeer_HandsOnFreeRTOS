@@ -46,11 +46,19 @@
 
 /* USER CODE BEGIN PV */
 
-xTaskHandle tskHdl_zCmdTask;
+xTaskHandle tskHdl_zInputHandleTask;
 xTaskHandle tskHdl_zMenuTask;
-xTaskHandle tskHdl_zPrintTask;
+xTaskHandle tskHdl_zPrintGUITask;
 xTaskHandle tskHdl_LEDTask;
 xTaskHandle tskHdl_RTCTask;
+
+QueueHandle_t queueHdl_zInputData;
+QueueHandle_t queueHdl_zOptionsPrint;
+
+TimerHandle_t timerHdl_zLEDTimer[ 4 ];
+TimerHandle_t timerHdl_zRTCTimer;
+
+volatile uint8_t userData;
 
 /* USER CODE END PV */
 
@@ -99,7 +107,29 @@ int main(void)
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 
-  status = xTaskCreate( )
+  status = xTaskCreate( usrtask_MenuTask, "Menu_Task", 250, NULL, 2, &tskHdl_zMenuTask );
+  configASSERT( status == pdPASS );
+  status = xTaskCreate( usrtask_CmdHandlerTask, "Cmd_Task", 250, NULL, 2, &tskHdl_zInputHandleTask );
+  configASSERT( status == pdPASS );
+  status = xTaskCreate( usrtask_PrintTask, "Print_Task", 250, NULL, 2, &tskHdl_zPrintGUITask );
+  configASSERT( status == pdPASS );
+  status = xTaskCreate( usrtask_LEDTask, "LED_Task", 250, NULL, 2, &tskHdl_LEDTask );
+  configASSERT( status == pdPASS );
+  status = xTaskCreate( usrtask_RTCTask, "RTC_Task", 250, NULL, 2, &tskHdl_RTCTask );
+  configASSERT( status == pdPASS );
+
+  /*Queue to hold user choice*/
+  queueHdl_zInputData = xQueueCreate( 10, sizeof( char ) );
+  configASSERT(  queueHdl_zInputData != NULL );
+
+  /*Queue to hold pointers to each menu GUI, GUI is just a formatted string*/
+  queueHdl_zOptionsPrint = xQueueCreate( 10, sizeof( size_t ) );
+  configASSERT( queueHdl_zOptionsPrint != NULL );
+
+  /*Enable UART in Receive Interrupt Mode*/
+  HAL_UART_Receive_IT( &huart2, &userData, 1 );
+
+  vTaskStartScheduler( );
 
   /* USER CODE END 2 */
 
@@ -161,6 +191,16 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+/**
+ * @brief USART2 Reception Complete Callback
+ * 
+ * @param huart 
+ */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+
+}
 
 /* USER CODE END 4 */
 
