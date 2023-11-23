@@ -44,6 +44,22 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
+typedef struct input_zInputCommand_t
+{
+  uint8_t payload[ 10 ];
+  uint8_t len;
+}input_zInputCommand_t;
+
+typedef enum state_zCurrAppState
+{
+  sMainMenu = 0,
+  sLEDEffect,
+  sRTCMenu,
+  sRTCTimeConfig,
+  sRTCDateConfig,
+  sRTCReport
+}state_zCurrAppState;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -61,11 +77,11 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
-void usrtask_MenuTask( void *param );
-void usrtask_CmdHandlerTask( void *param );
-void usrtask_PrintTask( void *param );
-void usrtask_LEDTask( void *param );
-void usrtask_RTCTask( void *param );
+void usrtsk_MenuTask( void *param );
+void usrtsk_InputHandleTask( void *param );
+void usrtsk_PrintGUITask( void *param );
+void usrtsk_LEDTask( void *param );
+void usrtsk_RTCTask( void *param );
 
 
 /* USER CODE END EFP */

@@ -20,7 +20,7 @@ const char *invalidMsg = "/-----------Invalid Option-----------/\n";
 /*EXTERNS_______________________________________________________________________________________________________________________________________*/
 /*##############################################################################################################################################*/
 
-
+extern input_zInputCommand_t inputCmd;
 
 /*##############################################################################################################################################*/
 /*TYPEDEFS/STRUCTS/ENUMS________________________________________________________________________________________________________________________*/
@@ -32,7 +32,8 @@ const char *invalidMsg = "/-----------Invalid Option-----------/\n";
 /*FUNCTION DECLARATIONS_________________________________________________________________________________________________________________________*/
 /*##############################################################################################################################################*/
 
-
+void usrtsk_ProcessCmd( input_zInputCommand_t *cmd );
+void usrtsk_ExtractCmd( input_zInputCommand_t *cmd );
 
 /*##############################################################################################################################################*/
 /*FUNCTIONS_____________________________________________________________________________________________________________________________________*/
@@ -43,7 +44,7 @@ const char *invalidMsg = "/-----------Invalid Option-----------/\n";
  * 
  * @param param 
  */
-void usrtask_MenuTask( void *param )
+void usrtsk_MenuTask( void *param )
 {
     while( 1 )
     {
@@ -56,10 +57,18 @@ void usrtask_MenuTask( void *param )
  * 
  * @param param 
  */
-void usrtask_CmdHandlerTask( void *param )
+void usrtsk_InputHandleTask( void *param )
 {
+    BaseType_t status;
     while( 1 )
     {
+        /*Wait for Notification*/
+        status = xTaskNotifyWait( 0, 0, NULL, portMAX_DELAY );
+        if( status == pdTRUE )
+        {
+            /*Notifcation Has been received*/
+            usrtsk_ProcessCmd( &inputCmd );
+        }
 
     }
 }
@@ -69,7 +78,7 @@ void usrtask_CmdHandlerTask( void *param )
  * 
  * @param param 
  */
-void usrtask_PrintTask( void *param )
+void usrtsk_PrintGUITask( void *param )
 {
     while( 1 )
     {
@@ -82,7 +91,7 @@ void usrtask_PrintTask( void *param )
  * 
  * @param param 
  */
-void usrtask_LEDTask( void *param )
+void usrtsk_LEDTask( void *param )
 {
     while( 1 )
     {
@@ -95,10 +104,22 @@ void usrtask_LEDTask( void *param )
  * 
  * @param param 
  */
-void usrtask_RTCTask( void *param )
+void usrtsk_RTCTask( void *param )
 {
     while( 1 )
     {
         
     }
+}
+
+void usrtsk_ProcessCmd( input_zInputCommand_t *cmd )
+{
+    
+    usrtsk_ExtractCmd( cmd );
+
+}
+
+void usrtsk_ExtractCmd( input_zInputCommand_t *cmd )
+{
+
 }

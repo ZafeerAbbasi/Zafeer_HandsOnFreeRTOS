@@ -60,6 +60,10 @@ TimerHandle_t timerHdl_zRTCTimer;
 
 volatile uint8_t userData;
 
+input_zInputCommand_t inputCmd;
+
+state_zCurrAppState currAppState;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -107,27 +111,26 @@ int main(void)
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 
-  status = xTaskCreate( usrtask_MenuTask, "Menu_Task", 250, NULL, 2, &tskHdl_zMenuTask );
+  status = xTaskCreate( usrtsk_MenuTask, "Menu_Task", 250, NULL, 2, &tskHdl_zMenuTask );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( usrtask_CmdHandlerTask, "Cmd_Task", 250, NULL, 2, &tskHdl_zInputHandleTask );
+  status = xTaskCreate( usrtsk_InputHandleTask, "Cmd_Task", 250, NULL, 2, &tskHdl_zInputHandleTask );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( usrtask_PrintTask, "Print_Task", 250, NULL, 2, &tskHdl_zPrintGUITask );
+  status = xTaskCreate( usrtsk_PrintGUITask, "Print_Task", 250, NULL, 2, &tskHdl_zPrintGUITask );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( usrtask_LEDTask, "LED_Task", 250, NULL, 2, &tskHdl_LEDTask );
+  status = xTaskCreate( usrtsk_LEDTask, "LED_Task", 250, NULL, 2, &tskHdl_LEDTask );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( usrtask_RTCTask, "RTC_Task", 250, NULL, 2, &tskHdl_RTCTask );
+  status = xTaskCreate( usrtsk_RTCTask, "RTC_Task", 250, NULL, 2, &tskHdl_RTCTask );
   configASSERT( status == pdPASS );
 
   /*Queue to hold user choice*/
   queueHdl_zInputData = xQueueCreate( 10, sizeof( char ) );
   configASSERT(  queueHdl_zInputData != NULL );
-
   /*Queue to hold pointers to each menu GUI, GUI is just a formatted string*/
   queueHdl_zOptionsPrint = xQueueCreate( 10, sizeof( size_t ) );
   configASSERT( queueHdl_zOptionsPrint != NULL );
 
   /*Enable UART in Receive Interrupt Mode*/
-  HAL_UART_Receive_IT( &huart2, &userData, 1 );
+  HAL_UART_Receive_IT( &huart2, ( uint8_t *)&userData, 1 );
 
   vTaskStartScheduler( );
 
@@ -199,7 +202,34 @@ void SystemClock_Config(void)
  */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+  uint8_t extraData;
+  BaseType_t status = pdFALSE;
+  status = xQueueIsQueueFullFromISR( queueHdl_zInputData );
 
+  if( status == pdFALSE )
+  {
+    /* Queue is NOT Full*/
+    xQueueSendFromISR( queueHdl_zInputData, ( void * )&userData, NULL );
+  }
+  else
+  {
+    /* Queue is FULL */
+    /* If The receieved Data is '\n' then add to end otherwise ignore*/
+    if( userData == '\n' )
+    {
+      /* Remove First Element and Add '\n' to Last */
+      xQueueReceiveFromISR( queueHdl_zInputData, ( void * )&extraData, NULL );
+      xQueueSendFromISR( queueHdl_zInputData, ( void * )&userData, NULL );
+    }
+  }
+  if( userData == '\n' )
+  {
+    /* Notify Input Handling Task*/
+    xTaskNotifyFromISR( tskHdl_zInputHandleTask, 0, eNoAction, NULL ); 
+  }
+
+  /* Enable UART in Receive Interrupt Mode*/
+  HAL_UART_Receive_IT( &huart2, ( uint8_t *)&userData, 1 );
 }
 
 /* USER CODE END 4 */
