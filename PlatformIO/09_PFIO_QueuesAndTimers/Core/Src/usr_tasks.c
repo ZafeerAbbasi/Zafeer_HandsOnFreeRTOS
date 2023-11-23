@@ -117,9 +117,45 @@ void usrtsk_ProcessCmd( input_zInputCommand_t *cmd )
     
     usrtsk_ExtractCmd( cmd );
 
+    switch( currAppState )
+    {
+        case sMainMenu:
+        {
+            xTaskNotify( tskHdl_zMenuTask, ( uint32_t )cmd, e)
+        }
+    }
+
 }
 
+/**
+ * @brief Function to extract the data bytes from the Queue and form a Command
+ * 
+ * @param cmd 
+ */
 void usrtsk_ExtractCmd( input_zInputCommand_t *cmd )
 {
+    uint8_t msg;
+    BaseType_t numMsgs;
 
+    numMsgs = uxQueueMessagesWaiting( queueHdl_zInputData );
+    if( numMsgs == 0 )
+    {
+        /*No Messages in Queue*/
+        return;
+    }
+    else
+    {
+        /*Messages in Queue*/
+        for( uint8_t i = 0; i < numMsgs; i++ )
+        {
+            xQueueReceive( queueHdl_zInputData, &msg, 0 );
+            taskENTER_CRITICAL( );
+            cmd->payload[ i ] = msg;
+            taskEXIT_CRITICAL( );
+        }
+        taskENTER_CRITICAL( );
+        cmd->len = numMsgs - 1;
+        cmd->payload[ numMsgs - 1 ] = '\0';
+        taskEXIT_CRITICAL( );
+    }
 }

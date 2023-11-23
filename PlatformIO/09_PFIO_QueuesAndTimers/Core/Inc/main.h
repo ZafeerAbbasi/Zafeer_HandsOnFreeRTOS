@@ -65,6 +65,22 @@ typedef enum state_zCurrAppState
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
 
+extern xTaskHandle tskHdl_zInputHandleTask;
+extern xTaskHandle tskHdl_zMenuTask;
+extern xTaskHandle tskHdl_zPrintGUITask;
+extern xTaskHandle tskHdl_LEDTask;
+extern xTaskHandle tskHdl_RTCTask;
+
+extern QueueHandle_t queueHdl_zInputData;
+extern QueueHandle_t queueHdl_zOptionsPrint;
+
+extern TimerHandle_t timerHdl_zLEDTimer[ 4 ];
+extern TimerHandle_t timerHdl_zRTCTimer;
+
+extern input_zInputCommand_t inputCmd;
+
+extern state_zCurrAppState currAppState;
+
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
