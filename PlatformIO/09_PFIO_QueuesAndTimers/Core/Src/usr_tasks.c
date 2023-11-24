@@ -21,6 +21,7 @@ const char *invalidMsg = "/-----------Invalid Option-----------/\n";
 /*##############################################################################################################################################*/
 
 extern input_zInputCommand_t inputCmd;
+extern UART_HandleTypeDef huart2;
 
 /*##############################################################################################################################################*/
 /*TYPEDEFS/STRUCTS/ENUMS________________________________________________________________________________________________________________________*/
@@ -46,8 +47,26 @@ void usrtsk_ExtractCmd( input_zInputCommand_t *cmd );
  */
 void usrtsk_MenuTask( void *param )
 {
+	uint32_t cmdAddr;
+    input_zInputCommand_t *cmd;
+	const char* msg_menu = "========================\r\n"
+							"|         Menu         |\r\n"
+							"========================\r\n"
+								"LED effect    ----> 0\r\n"
+								"Date and time ----> 1\r\n"
+								"Exit          ----> 2\r\n"
+								"Enter your choice here : \n";
+    currAppState = sMainMenu;
+    HAL_UART_Transmit( &huart2, ( uint8_t * )msg_menu, strlen( msg_menu ), HAL_MAX_DELAY );
     while( 1 )
     {
+        //xQueueSend( queueHdl_zOptionsPrint, &msg_menu, portMAX_DELAY );
+        xTaskNotifyWait( 0, 0, &cmdAddr, portMAX_DELAY );
+        cmd = ( input_zInputCommand_t * )cmdAddr;
+        if( cmd->len == 1 )
+        {
+            printf( "Hello There\r\n" );
+        }
 
     }
 }
@@ -81,7 +100,8 @@ void usrtsk_InputHandleTask( void *param )
 void usrtsk_PrintGUITask( void *param )
 {
     while( 1 )
-    {
+    {  
+        vTaskDelay( portMAX_DELAY );
         
     }
 }
@@ -95,7 +115,7 @@ void usrtsk_LEDTask( void *param )
 {
     while( 1 )
     {
-        
+        vTaskDelay( portMAX_DELAY );
     }
 }
 
@@ -108,7 +128,7 @@ void usrtsk_RTCTask( void *param )
 {
     while( 1 )
     {
-        
+        vTaskDelay( portMAX_DELAY );
     }
 }
 
@@ -121,7 +141,21 @@ void usrtsk_ProcessCmd( input_zInputCommand_t *cmd )
     {
         case sMainMenu:
         {
-            xTaskNotify( tskHdl_zMenuTask, ( uint32_t )cmd, e)
+            xTaskNotify( tskHdl_zMenuTask, ( uint32_t )cmd, eSetValueWithOverwrite );
+            break;
+        }
+        case sLEDEffect:
+        {
+            xTaskNotify( tskHdl_LEDTask, ( uint32_t )cmd, eSetValueWithOverwrite );
+            break;
+        }
+        case sRTCMenu:
+        case sRTCTimeConfig:
+        case sRTCDateConfig:
+        case sRTCReport:
+        {
+            xTaskNotify( tskHdl_RTCTask, ( uint32_t )cmd, eSetValueWithOverwrite );
+            break;
         }
     }
 

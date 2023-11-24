@@ -125,8 +125,9 @@ int main(void)
   /*Queue to hold user choice*/
   queueHdl_zInputData = xQueueCreate( 10, sizeof( char ) );
   configASSERT(  queueHdl_zInputData != NULL );
-  /*Queue to hold pointers to each menu GUI, GUI is just a formatted string*/
-  queueHdl_zOptionsPrint = xQueueCreate( 10, sizeof( size_t ) );
+
+  /*Queue to hold pointers to each menu GUI char pointer, GUI is just a formatted string*/
+  queueHdl_zOptionsPrint = xQueueCreate( 10, sizeof( char * ) );
   configASSERT( queueHdl_zOptionsPrint != NULL );
 
   /*Enable UART in Receive Interrupt Mode*/
