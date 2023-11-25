@@ -49,8 +49,8 @@
 xTaskHandle tskHdl_zInputHandleTask;
 xTaskHandle tskHdl_zMenuTask;
 xTaskHandle tskHdl_zPrintGUITask;
-xTaskHandle tskHdl_LEDTask;
-xTaskHandle tskHdl_RTCTask;
+xTaskHandle tskHdl_zLEDTask;
+xTaskHandle tskHdl_zRTCTask;
 
 QueueHandle_t queueHdl_zInputData;
 QueueHandle_t queueHdl_zOptionsPrint;
@@ -117,9 +117,9 @@ int main(void)
   configASSERT( status == pdPASS );
   status = xTaskCreate( usrtsk_PrintGUITask, "Print_Task", 250, NULL, 2, &tskHdl_zPrintGUITask );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( usrtsk_LEDTask, "LED_Task", 250, NULL, 2, &tskHdl_LEDTask );
+  status = xTaskCreate( usrtsk_LEDTask, "LED_Task", 250, NULL, 2, &tskHdl_zLEDTask );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( usrtsk_RTCTask, "RTC_Task", 250, NULL, 2, &tskHdl_RTCTask );
+  status = xTaskCreate( usrtsk_RTCTask, "RTC_Task", 250, NULL, 2, &tskHdl_zRTCTask );
   configASSERT( status == pdPASS );
 
   /*Queue to hold user choice*/

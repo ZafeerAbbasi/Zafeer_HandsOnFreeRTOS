@@ -68,8 +68,8 @@ typedef enum state_zCurrAppState
 extern xTaskHandle tskHdl_zInputHandleTask;
 extern xTaskHandle tskHdl_zMenuTask;
 extern xTaskHandle tskHdl_zPrintGUITask;
-extern xTaskHandle tskHdl_LEDTask;
-extern xTaskHandle tskHdl_RTCTask;
+extern xTaskHandle tskHdl_zLEDTask;
+extern xTaskHandle tskHdl_zRTCTask;
 
 extern QueueHandle_t queueHdl_zInputData;
 extern QueueHandle_t queueHdl_zOptionsPrint;
@@ -171,6 +171,16 @@ void usrtsk_RTCTask( void *param );
 #define MEMS_INT2_GPIO_Port GPIOE
 
 /* USER CODE BEGIN Private defines */
+
+#define LED1Pin  LD4_Pin
+#define LED2Pin  LD3_Pin
+#define LED3Pin  LD5_Pin
+#define LED4Pin  LD6_Pin
+
+#define LED1Port LD4_GPIO_Port
+#define LED2Port LD3_GPIO_Port
+#define LED3Port LD5_GPIO_Port
+#define LED4Port LD6_GPIO_Port
 
 /* USER CODE END Private defines */
 

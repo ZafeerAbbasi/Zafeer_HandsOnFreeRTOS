@@ -47,27 +47,57 @@ void usrtsk_ExtractCmd( input_zInputCommand_t *cmd );
  */
 void usrtsk_MenuTask( void *param )
 {
-	uint32_t cmdAddr;
     input_zInputCommand_t *cmd;
+    uint8_t usrChoice;
 	const char* msg_menu = "========================\r\n"
 							"|         Menu         |\r\n"
 							"========================\r\n"
 								"LED effect    ----> 0\r\n"
 								"Date and time ----> 1\r\n"
 								"Exit          ----> 2\r\n"
-								"Enter your choice here : \n";
+								"Enter your choice here : ";
     currAppState = sMainMenu;
-    HAL_UART_Transmit( &huart2, ( uint8_t * )msg_menu, strlen( msg_menu ), HAL_MAX_DELAY );
     while( 1 )
     {
-        //xQueueSend( queueHdl_zOptionsPrint, &msg_menu, portMAX_DELAY );
-        xTaskNotifyWait( 0, 0, &cmdAddr, portMAX_DELAY );
-        cmd = ( input_zInputCommand_t * )cmdAddr;
+        xQueueSend( queueHdl_zOptionsPrint, &msg_menu, portMAX_DELAY );
+        xTaskNotifyWait( 0, 0, ( uint32_t * )&cmd, portMAX_DELAY );
+
         if( cmd->len == 1 )
         {
-            printf( "Hello There\r\n" );
+            usrChoice = cmd->payload - 48; //ASCII to Decimal
+            switch( usrChoice )
+            {
+                case 0: //LED Effect
+                {
+                    currAppState = sLEDEffect;
+                    xTaskNotify( tskHdl_zLEDTask, 0, eNoAction );
+                    break;
+                }
+                case 1: //RTC Menu
+                {
+                    currAppState = sRTCMenu;
+                    xTaskNotify( tskHdl_zRTCTask, 0, eNoAction );
+                    break;
+                }
+                case 2: //Exit
+                {
+                    break;
+                }
+                default:
+                {
+                    xQueueSend( queueHdl_zOptionsPrint, &invalidMsg, portMAX_DELAY );
+                    continue; //Jump to next iteration
+                }
+            }
+        }
+        else
+        {
+            //Invalid Input
+            xQueueSend( queueHdl_zOptionsPrint, &invalidMsg, portMAX_DELAY );
         }
 
+        /* Wait to run again until it has been notified */
+        xTaskNotifyWait( 0, 0, NULL, portMAX_DELAY );
     }
 }
 
@@ -113,9 +143,61 @@ void usrtsk_PrintGUITask( void *param )
  */
 void usrtsk_LEDTask( void *param )
 {
+    char *usrChoice;
+    input_zInputCommand_t *cmd;
+    const char* msg_led = "========================\r\n"
+						  "|      LED Effect     |\r\n"
+						  "========================\r\n"
+						  "(none,e1,e2,e3,e4)\r\n"
+						  "Enter your choice here : ";
+    
     while( 1 )
     {
-        vTaskDelay( portMAX_DELAY );
+        /* Wait for Activation Notification From Main Task */
+        xTaskNotifyWait( 0, 0, NULL, portMAX_DELAY );
+
+        /*Print LED Menu and wait for input*/
+        xQueueSend( queueHdl_zOptionsPrint, &msg_led, portMAX_DELAY );
+        xTaskNotifyWait( 0, 0, ( uint32_t * )&cmd, portMAX_DELAY );
+        usrChoice = cmd->payload;
+
+        if( cmd->len <= 4 )
+        {
+            if( strcmp( usrChoice, "none" ) == 0 )
+            {
+                led_LEDEffectStop( );
+            }
+            else if( strcmp( usrChoice, "e1" ) == 0 )
+            {
+                led_LEDEffect( 1 );
+            }
+            else if( strcmp( usrChoice, "e2" ) == 0 )
+            {
+                led_LEDEffect( 2 );
+            }
+            else if( strcmp( usrChoice, "e3" ) == 0 )
+            {
+                led_LEDEffect( 3 );
+            }
+            else if( strcmp( usrChoice, "e4" ) == 0 )
+            {
+                led_LEDEffect( 4 );
+            }
+            else
+            {
+                xQueueSend( queueHdl_zOptionsPrint, &invalidMsg, portMAX_DELAY );
+            }
+        }
+        else
+        {
+            xQueueSend( queueHdl_zOptionsPrint, &invalidMsg, portMAX_DELAY );
+        }
+
+        /* Update State Variable */
+        currAppState = sMainMenu;
+
+        /*Notify Main Task*/
+        xTaskNotify( tskHdl_zMenuTask, 0, eNoAction );
     }
 }
 
@@ -146,7 +228,7 @@ void usrtsk_ProcessCmd( input_zInputCommand_t *cmd )
         }
         case sLEDEffect:
         {
-            xTaskNotify( tskHdl_LEDTask, ( uint32_t )cmd, eSetValueWithOverwrite );
+            xTaskNotify( tskHdl_zLEDTask, ( uint32_t )cmd, eSetValueWithOverwrite );
             break;
         }
         case sRTCMenu:
@@ -154,7 +236,7 @@ void usrtsk_ProcessCmd( input_zInputCommand_t *cmd )
         case sRTCDateConfig:
         case sRTCReport:
         {
-            xTaskNotify( tskHdl_RTCTask, ( uint32_t )cmd, eSetValueWithOverwrite );
+            xTaskNotify( tskHdl_zRTCTask, ( uint32_t )cmd, eSetValueWithOverwrite );
             break;
         }
     }
