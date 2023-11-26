@@ -9,6 +9,18 @@
 /*##############################################################################################################################################*/
 
 const char *invalidMsg = "/-----------Invalid Option-----------/\n";
+const char* msg_menu = "========================\r\n"
+							"|         Menu         |\r\n"
+							"========================\r\n"
+								"LED effect    ----> 0\r\n"
+								"Date and time ----> 1\r\n"
+								"Exit          ----> 2\r\n"
+								"Enter your choice here : ";
+const char* msg_led = "========================\r\n"
+						  "|      LED Effect     |\r\n"
+						  "========================\r\n"
+						  "(none,e1,e2,e3,e4)\r\n"
+						  "Enter your choice here : ";
 
 /*##############################################################################################################################################*/
 /*DEFINES_______________________________________________________________________________________________________________________________________*/
@@ -45,26 +57,20 @@ void usrtsk_ExtractCmd( input_zInputCommand_t *cmd );
  * 
  * @param param 
  */
-void usrtsk_MenuTask( void *param )
+void USRTSK_MenuTask( void *param )
 {
     input_zInputCommand_t *cmd;
     uint8_t usrChoice;
-	const char* msg_menu = "========================\r\n"
-							"|         Menu         |\r\n"
-							"========================\r\n"
-								"LED effect    ----> 0\r\n"
-								"Date and time ----> 1\r\n"
-								"Exit          ----> 2\r\n"
-								"Enter your choice here : ";
     currAppState = sMainMenu;
+
     while( 1 )
     {
-        xQueueSend( queueHdl_zOptionsPrint, &msg_menu, portMAX_DELAY );
+        //xQueueSend( queueHdl_zOptionsPrint, &msg_menu, portMAX_DELAY );
         xTaskNotifyWait( 0, 0, ( uint32_t * )&cmd, portMAX_DELAY );
 
         if( cmd->len == 1 )
         {
-            usrChoice = cmd->payload - 48; //ASCII to Decimal
+            usrChoice = cmd->payload[ 0 ] - 48; //ASCII to Decimal
             switch( usrChoice )
             {
                 case 0: //LED Effect
@@ -106,7 +112,7 @@ void usrtsk_MenuTask( void *param )
  * 
  * @param param 
  */
-void usrtsk_InputHandleTask( void *param )
+void USRTSK_InputHandleTask( void *param )
 {
     BaseType_t status;
     while( 1 )
@@ -127,7 +133,7 @@ void usrtsk_InputHandleTask( void *param )
  * 
  * @param param 
  */
-void usrtsk_PrintGUITask( void *param )
+void USRTSK_PrintGUITask( void *param )
 {
     while( 1 )
     {  
@@ -141,15 +147,10 @@ void usrtsk_PrintGUITask( void *param )
  * 
  * @param param 
  */
-void usrtsk_LEDTask( void *param )
+void USRTSK_LEDTask( void *param )
 {
     char *usrChoice;
     input_zInputCommand_t *cmd;
-    const char* msg_led = "========================\r\n"
-						  "|      LED Effect     |\r\n"
-						  "========================\r\n"
-						  "(none,e1,e2,e3,e4)\r\n"
-						  "Enter your choice here : ";
     
     while( 1 )
     {
@@ -157,31 +158,31 @@ void usrtsk_LEDTask( void *param )
         xTaskNotifyWait( 0, 0, NULL, portMAX_DELAY );
 
         /*Print LED Menu and wait for input*/
-        xQueueSend( queueHdl_zOptionsPrint, &msg_led, portMAX_DELAY );
+        //xQueueSend( queueHdl_zOptionsPrint, &msg_led, portMAX_DELAY );
         xTaskNotifyWait( 0, 0, ( uint32_t * )&cmd, portMAX_DELAY );
-        usrChoice = cmd->payload;
+        usrChoice = (char *)cmd->payload;
 
         if( cmd->len <= 4 )
         {
             if( strcmp( usrChoice, "none" ) == 0 )
             {
-                led_LEDEffectStop( );
+                LED_LEDEffectStop( );
             }
             else if( strcmp( usrChoice, "e1" ) == 0 )
             {
-                led_LEDEffect( 1 );
+                LED_LEDEffect( 1 );
             }
             else if( strcmp( usrChoice, "e2" ) == 0 )
             {
-                led_LEDEffect( 2 );
+                LED_LEDEffect( 2 );
             }
             else if( strcmp( usrChoice, "e3" ) == 0 )
             {
-                led_LEDEffect( 3 );
+                LED_LEDEffect( 3 );
             }
             else if( strcmp( usrChoice, "e4" ) == 0 )
             {
-                led_LEDEffect( 4 );
+                LED_LEDEffect( 4 );
             }
             else
             {
@@ -206,7 +207,7 @@ void usrtsk_LEDTask( void *param )
  * 
  * @param param 
  */
-void usrtsk_RTCTask( void *param )
+void USRTSK_RTCTask( void *param )
 {
     while( 1 )
     {
@@ -214,6 +215,11 @@ void usrtsk_RTCTask( void *param )
     }
 }
 
+/**
+ * @brief Function to process the User Command and send it to the respective Task
+ * 
+ * @param cmd Pointer to User Command
+ */
 void usrtsk_ProcessCmd( input_zInputCommand_t *cmd )
 {
     
@@ -246,7 +252,7 @@ void usrtsk_ProcessCmd( input_zInputCommand_t *cmd )
 /**
  * @brief Function to extract the data bytes from the Queue and form a Command
  * 
- * @param cmd 
+ * @param cmd Pointer to User Command
  */
 void usrtsk_ExtractCmd( input_zInputCommand_t *cmd )
 {

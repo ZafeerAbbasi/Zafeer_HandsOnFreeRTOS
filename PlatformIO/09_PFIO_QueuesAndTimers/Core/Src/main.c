@@ -70,6 +70,8 @@ state_zCurrAppState currAppState;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
+void timer_LEDTimerCallBack( TimerHandle_t xTimer );
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -111,15 +113,15 @@ int main(void)
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
 
-  status = xTaskCreate( usrtsk_MenuTask, "Menu_Task", 250, NULL, 2, &tskHdl_zMenuTask );
+  status = xTaskCreate( USRTSK_MenuTask, "Menu_Task", 250, NULL, 2, &tskHdl_zMenuTask );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( usrtsk_InputHandleTask, "Cmd_Task", 250, NULL, 2, &tskHdl_zInputHandleTask );
+  status = xTaskCreate( USRTSK_InputHandleTask, "Cmd_Task", 250, NULL, 2, &tskHdl_zInputHandleTask );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( usrtsk_PrintGUITask, "Print_Task", 250, NULL, 2, &tskHdl_zPrintGUITask );
+  status = xTaskCreate( USRTSK_PrintGUITask, "Print_Task", 250, NULL, 2, &tskHdl_zPrintGUITask );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( usrtsk_LEDTask, "LED_Task", 250, NULL, 2, &tskHdl_zLEDTask );
+  status = xTaskCreate( USRTSK_LEDTask, "LED_Task", 250, NULL, 2, &tskHdl_zLEDTask );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( usrtsk_RTCTask, "RTC_Task", 250, NULL, 2, &tskHdl_zRTCTask );
+  status = xTaskCreate( USRTSK_RTCTask, "RTC_Task", 250, NULL, 2, &tskHdl_zRTCTask );
   configASSERT( status == pdPASS );
 
   /*Queue to hold user choice*/
@@ -129,6 +131,13 @@ int main(void)
   /*Queue to hold pointers to each menu GUI char pointer, GUI is just a formatted string*/
   queueHdl_zOptionsPrint = xQueueCreate( 10, sizeof( char * ) );
   configASSERT( queueHdl_zOptionsPrint != NULL );
+
+  /*Create Timer Software Timers*/
+  for( int i = 0; i < 4; i++ )
+  {
+    timerHdl_zLEDTimer[ i ] = xTimerCreate( "LED_Timer", pdMS_TO_TICKS( 500 ), pdTRUE, ( void * )i + 1, timer_LEDTimerCallBack );
+    configASSERT( timerHdl_zLEDTimer[ i ] != NULL );
+  }
 
   /*Enable UART in Receive Interrupt Mode*/
   HAL_UART_Receive_IT( &huart2, ( uint8_t *)&userData, 1 );
@@ -195,6 +204,42 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+/* CallBack Function Implementations --------------------------------------------------------------------------------------------*/
+
+void timer_LEDTimerCallBack( TimerHandle_t xTimer )
+{
+    configASSERT( xTimer != NULL );
+    uint32_t timerID = ( uint32_t )pvTimerGetTimerID( xTimer );
+
+    switch( timerID )
+    {
+        case 1:
+        {
+            LED_LEDEffect1( );
+            break;
+        }
+        case 2:
+        {
+            LED_LEDEffect2( );
+            break;
+        }
+        case 3:
+        {
+            LED_LEDEffect3( );
+            break;
+        }
+        case 4:
+        {
+            LED_LEDEffect4( );
+            break;
+        }
+        default:
+        {
+            break;
+        }
+    }
+}
 
 /**
  * @brief USART2 Reception Complete Callback

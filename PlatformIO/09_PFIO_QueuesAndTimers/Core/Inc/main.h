@@ -44,6 +44,12 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
+typedef struct GPIO_GPIOPinPortPair_t
+{
+  GPIO_TypeDef *port;
+  uint16_t pin;
+}GPIO_GPIOPinPortPair_t;
+
 typedef struct input_zInputCommand_t
 {
   uint8_t payload[ 10 ];
@@ -93,11 +99,22 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
-void usrtsk_MenuTask( void *param );
-void usrtsk_InputHandleTask( void *param );
-void usrtsk_PrintGUITask( void *param );
-void usrtsk_LEDTask( void *param );
-void usrtsk_RTCTask( void *param );
+void USRTSK_MenuTask( void *param );
+void USRTSK_InputHandleTask( void *param );
+void USRTSK_PrintGUITask( void *param );
+void USRTSK_LEDTask( void *param );
+void USRTSK_RTCTask( void *param );
+
+void LED_LEDEffectStop( void );
+void LED_LEDEffect( int LedNum );
+void LED_TurnOffAllLEDs( void );
+void LED_TurnOnAllLEDs( void );
+void LED_TurnOnOddLEDs( void );
+void LED_TurnOnEvenLEDs( void );
+void LED_LEDEffect1( void );
+void LED_LEDEffect2( void );
+void LED_LEDEffect3( void );
+void LED_LEDEffect4( void );
 
 
 /* USER CODE END EFP */
@@ -177,8 +194,8 @@ void usrtsk_RTCTask( void *param );
 #define LED3Pin  LD5_Pin
 #define LED4Pin  LD6_Pin
 
-#define LED1Port LD4_GPIO_Port
-#define LED2Port LD3_GPIO_Port
+#define LED1Port LD3_GPIO_Port 
+#define LED2Port LD4_GPIO_Port
 #define LED3Port LD5_GPIO_Port
 #define LED4Port LD6_GPIO_Port
 
