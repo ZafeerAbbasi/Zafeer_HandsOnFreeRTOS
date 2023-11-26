@@ -121,8 +121,8 @@ int main(void)
   configASSERT( status == pdPASS );
   status = xTaskCreate( USRTSK_LEDTask, "LED_Task", 250, NULL, 2, &tskHdl_zLEDTask );
   configASSERT( status == pdPASS );
-  status = xTaskCreate( USRTSK_RTCTask, "RTC_Task", 250, NULL, 2, &tskHdl_zRTCTask );
-  configASSERT( status == pdPASS );
+  // status = xTaskCreate( USRTSK_RTCTask, "RTC_Task", 250, NULL, 2, &tskHdl_zRTCTask );
+  // configASSERT( status == pdPASS );
 
   /*Queue to hold user choice*/
   queueHdl_zInputData = xQueueCreate( 10, sizeof( char ) );
@@ -151,7 +151,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    // HAL_UART_Transmit( &huart2, "Hello", strlen( "Hello" ), HAL_MAX_DELAY );
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

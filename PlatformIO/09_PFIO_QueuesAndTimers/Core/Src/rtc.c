@@ -102,4 +102,34 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef* rtcHandle)
 
 /* USER CODE BEGIN 1 */
 
+RTC_ConfigureDate( RTC_DateTypeDef *sDate )
+{
+
+}
+
+RTC_ConfigureTime( RTC_TimeTypeDef *sTime )
+{
+
+}
+
+void RTC_ShowTimeDate( void )
+{
+    static char timeStr[ 20 ];
+    static char dateStr[ 20 ];
+    RTC_DateTypeDef sDate;
+    RTC_TimeTypeDef sTime;
+    memset( &sDate, 0, sizeof( sDate ) );
+    memeset( &sTime, 0, sizeof( sTime ) );
+
+    /*Get RTC Current Time and Date*/
+    HAL_RTC_GetTime( &hrtc, &sTime, RTC_FORMAT_BIN );
+    HAL_RTC_GetDate( &hrtc, &sDate, RTC_FORMAT_BIN );
+
+    char *timeFormat = ( sTime.TimeFormat == RTC_HOURFORMAT12_AM ) ? "AM" : "PM";
+
+    /*Display Time Format*/
+
+
+}
+
 /* USER CODE END 1 */

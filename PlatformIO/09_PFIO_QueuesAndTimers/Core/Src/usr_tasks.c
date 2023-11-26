@@ -8,19 +8,41 @@
 /*GLOBALS_______________________________________________________________________________________________________________________________________*/
 /*##############################################################################################################################################*/
 
-const char *invalidMsg = "/-----------Invalid Option-----------/\n";
-const char* msg_menu = "========================\r\n"
+const char *invalidMsg = "\n/-----------Invalid Option-----------/\n";
+const char* msg_menu = "\n\n========================\r\n"
 							"|         Menu         |\r\n"
 							"========================\r\n"
 								"LED effect    ----> 0\r\n"
 								"Date and time ----> 1\r\n"
 								"Exit          ----> 2\r\n"
 								"Enter your choice here : ";
-const char* msg_led = "========================\r\n"
-						  "|      LED Effect     |\r\n"
+const char* msg_led = "\n\n========================\r\n"
+						  "|      LED Effect       |\r\n"
 						  "========================\r\n"
 						  "(none,e1,e2,e3,e4)\r\n"
 						  "Enter your choice here : ";
+const char* msg_rtc1 = "\n\n========================\r\n"
+							"|         RTC          |\r\n"
+							"========================\r\n";
+
+const char* msg_rtc2 = "Configure Time            ----> 0\r\n"
+                        "Configure Date            ----> 1\r\n"
+                        "Enable reporting          ----> 2\r\n"
+                        "Exit                      ----> 3\r\n"
+                        "Enter your choice here : ";
+
+
+const char *msg_rtc_hh = "Enter hour(1-12):";
+const char *msg_rtc_mm = "Enter minutes(0-59):";
+const char *msg_rtc_ss = "Enter seconds(0-59):";
+
+const char *msg_rtc_dd  = "Enter date(1-31):";
+const char *msg_rtc_mo  ="Enter month(1-12):";
+const char *msg_rtc_dow  = "Enter day(1-7 sun:1):";
+const char *msg_rtc_yr  = "Enter year(0-99):";
+
+const char *msg_conf = "Configuration successful\n";
+const char *msg_rtc_report = "Enable time&date reporting(y/n)?: ";                         
 
 /*##############################################################################################################################################*/
 /*DEFINES_______________________________________________________________________________________________________________________________________*/
@@ -62,10 +84,9 @@ void USRTSK_MenuTask( void *param )
     input_zInputCommand_t *cmd;
     uint8_t usrChoice;
     currAppState = sMainMenu;
-
     while( 1 )
     {
-        //xQueueSend( queueHdl_zOptionsPrint, &msg_menu, portMAX_DELAY );
+        xQueueSend( queueHdl_zOptionsPrint, &msg_menu, portMAX_DELAY );
         xTaskNotifyWait( 0, 0, ( uint32_t * )&cmd, portMAX_DELAY );
 
         if( cmd->len == 1 )
@@ -100,6 +121,7 @@ void USRTSK_MenuTask( void *param )
         {
             //Invalid Input
             xQueueSend( queueHdl_zOptionsPrint, &invalidMsg, portMAX_DELAY );
+            continue;
         }
 
         /* Wait to run again until it has been notified */
@@ -135,10 +157,11 @@ void USRTSK_InputHandleTask( void *param )
  */
 void USRTSK_PrintGUITask( void *param )
 {
+    uint32_t msg;
     while( 1 )
     {  
-        vTaskDelay( portMAX_DELAY );
-        
+        xQueueReceive( queueHdl_zOptionsPrint, &msg, portMAX_DELAY );
+        HAL_UART_Transmit( &huart2, ( uint8_t * )msg, strlen( ( char * )msg ), HAL_MAX_DELAY );
     }
 }
 
@@ -158,7 +181,7 @@ void USRTSK_LEDTask( void *param )
         xTaskNotifyWait( 0, 0, NULL, portMAX_DELAY );
 
         /*Print LED Menu and wait for input*/
-        //xQueueSend( queueHdl_zOptionsPrint, &msg_led, portMAX_DELAY );
+        xQueueSend( queueHdl_zOptionsPrint, &msg_led, portMAX_DELAY );
         xTaskNotifyWait( 0, 0, ( uint32_t * )&cmd, portMAX_DELAY );
         usrChoice = (char *)cmd->payload;
 
@@ -209,9 +232,22 @@ void USRTSK_LEDTask( void *param )
  */
 void USRTSK_RTCTask( void *param )
 {
+    input_zInputCommand_t *cmd;
     while( 1 )
     {
-        vTaskDelay( portMAX_DELAY );
+        /*Wait for notification*/
+        xTaskNotifyWait( 0, 0, NULL, portMAX_DELAY );
+
+        /*Print RTC Menu and wait for input*/
+        xQueueSend( queueHdl_zOptionsPrint, &msg_rtc1, portMAX_DELAY );
+        RTC_ShowTimeDate( );
+        xQueueSend( queueHdl_zOptionsPrint, &msg_rtc2, portMAX_DELAY );
+
+        while( currAppState != sMainMenu )
+        {
+            xTaskNotifyWait( 0, 0, ( uint32_t * )&cmd, portMAX_DELAY );
+        }
+
     }
 }
 
