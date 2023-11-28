@@ -91,8 +91,6 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-  BaseType_t status;
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -129,12 +127,12 @@ int main(void)
     with the interrupt.  The handler task is created with a high priority to
     ensure it runs immediately after the interrupt exits.  In this case a
     priority of 3 is chosen. */
-    xTaskCreate( vHandlerTask, "Handler", 500, NULL, 1, NULL );
+    xTaskCreate( vHandlerTask, "Handler", 500, NULL, 3, NULL );
 
     /* Create the task that will periodically generate a software interrupt.
     This is created with a priority below the handler task to ensure it will
     get preempted each time the handler task exist the Blocked state. */
-    xTaskCreate( vPeriodicTask, "Periodic", 500, NULL, 3, NULL );
+    xTaskCreate( vPeriodicTask, "Periodic", 500, NULL, 2, NULL );
 
     /* Start the scheduler so the created tasks start executing. */
     vTaskStartScheduler();
@@ -227,7 +225,7 @@ static void vPeriodicTask( void *pvParameters )
   {
     /* This task is just used to 'simulate' an interrupt.  This is done by
     periodically generating a software interrupt. */
-    vTaskDelay( pdMS_TO_TICKS(500) );
+    vTaskDelay( pdMS_TO_TICKS(2000) );
 
     /* Generate the interrupt, printing a message both before hand and
     afterwards so the sequence of execution is evident from the output. */
@@ -235,7 +233,8 @@ static void vPeriodicTask( void *pvParameters )
     HAL_UART_Transmit(&huart2,(uint8_t*)usr_msg,strlen(usr_msg),HAL_MAX_DELAY);
 
     //pend the interrupt
-    NVIC_SetPendingIRQ(EXTI15_10_IRQn);
+    HAL_NVIC_SetPendingIRQ( EXTI0_IRQn );
+    __HAL_GPIO_EXTI_GENERATE_SWIT( B1_Pin );
 
     sprintf(usr_msg, "Periodic task - Resuming.\r\n" );
     HAL_UART_Transmit(&huart2,(uint8_t*)usr_msg,strlen(usr_msg),HAL_MAX_DELAY);
@@ -255,11 +254,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   sprintf(usr_msg,"==>Button_Handler\r\n");
   HAL_UART_Transmit(&huart2,(uint8_t*)usr_msg,strlen(usr_msg),HAL_MAX_DELAY);
 
-  xSemaphoreGiveFromISR( xCountingSemaphore, &xHigherPriorityTaskWoken );
-  xSemaphoreGiveFromISR( xCountingSemaphore, &xHigherPriorityTaskWoken );
-  xSemaphoreGiveFromISR( xCountingSemaphore, &xHigherPriorityTaskWoken );
-  xSemaphoreGiveFromISR( xCountingSemaphore, &xHigherPriorityTaskWoken );
-  xSemaphoreGiveFromISR( xCountingSemaphore, &xHigherPriorityTaskWoken );
+  xSemaphoreGiveFromISR( xCountingSemaphore, NULL );
+  xSemaphoreGiveFromISR( xCountingSemaphore, NULL );
+  xSemaphoreGiveFromISR( xCountingSemaphore, NULL );
+  xSemaphoreGiveFromISR( xCountingSemaphore, NULL );
+  xSemaphoreGiveFromISR( xCountingSemaphore, NULL );
 
   /* Giving the semaphore may have unblocked a task - if it did and the
   unblocked task has a priority equal to or above the currently executing
