@@ -1,4 +1,10 @@
 {
     "cmake.configureOnOpen": false,
-    "breadcrumbs.symbolSortOrder": "type"
+    "breadcrumbs.symbolSortOrder": "type",
+    "files.associations": {
+        "usart.h": "c",
+        "freertos.h": "c",
+        "task.h": "c",
+        "main.h": "c"
+    }
 }

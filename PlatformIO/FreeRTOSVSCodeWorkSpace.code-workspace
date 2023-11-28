@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "09_PFIO_QueuesAndTimers"
+			"path": "11_PFIO_CountingSemaphore"
 		}
 	],
 	"settings": {
@@ -44,7 +44,10 @@
 			"task.h": "c",
 			"freertos.h": "c",
 			"segger_sysview_freertos.h": "c",
-			"cpu_utils.h": "c"
+			"cpu_utils.h": "c",
+			"rtc.h": "c",
+			"stm32f4xx_it.h": "c",
+			"freertosconfig.h": "c"
 		},
 		"git.ignoreLimitWarning": true
 	}

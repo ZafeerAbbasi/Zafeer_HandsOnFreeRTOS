@@ -24,6 +24,9 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "usart.h"
+#include "stdio.h"
+#include "string.h"
 
 /* USER CODE END Includes */
 
@@ -108,6 +111,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /*Enable SEGGER UART*/
@@ -357,6 +361,8 @@ void btn_ButtonInterruptHandler( void )
   xTaskNotifyFromISR( tsk_zNxtTskToDeleteHdl, 0, eNoAction, &pulPreviousNotificationValue );
   traceISR_EXIT( );
   portYIELD_FROM_ISR( pulPreviousNotificationValue );
+
+  HAL_UART_Transmit( &huart2, ( uint8_t * ) "Button Pressed\r\n", strlen( "Button Pressed\r\n" ), HAL_MAX_DELAY );
 }
 
 // static void btn_ButtonHandler( void *params )
