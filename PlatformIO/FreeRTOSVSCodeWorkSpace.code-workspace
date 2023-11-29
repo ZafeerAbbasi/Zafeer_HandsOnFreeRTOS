@@ -1,5 +1,9 @@
 {
-	"folders": [],
+	"folders": [
+		{
+			"path": "12_PFIO_MutualExclusionUsingBinarySemaphore"
+		}
+	],
 	"settings": {
 		"files.associations": {
 			"stdint.h": "c",
