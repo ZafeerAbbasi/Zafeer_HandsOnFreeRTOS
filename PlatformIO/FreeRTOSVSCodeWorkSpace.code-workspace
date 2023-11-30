@@ -1,7 +1,7 @@
 {
 	"folders": [
 		{
-			"path": "12_PFIO_MutualExclusionUsingBinarySemaphore"
+			"path": "13_PFIO_MutualExclusingUsingMutexAPI"
 		}
 	],
 	"settings": {
@@ -47,7 +47,8 @@
 			"cpu_utils.h": "c",
 			"rtc.h": "c",
 			"stm32f4xx_it.h": "c",
-			"freertosconfig.h": "c"
+			"freertosconfig.h": "c",
+			"semphr.h": "c"
 		},
 		"git.ignoreLimitWarning": true
 	}
