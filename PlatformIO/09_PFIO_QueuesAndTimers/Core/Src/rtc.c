@@ -102,16 +102,6 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef* rtcHandle)
 
 /* USER CODE BEGIN 1 */
 
-RTC_ConfigureDate( RTC_DateTypeDef *sDate )
-{
-
-}
-
-RTC_ConfigureTime( RTC_TimeTypeDef *sTime )
-{
-
-}
-
 void RTC_ShowTimeDate( void )
 {
     static char timeStr[ 20 ];
@@ -127,9 +117,47 @@ void RTC_ShowTimeDate( void )
 
     char *timeFormat = ( sTime.TimeFormat == RTC_HOURFORMAT12_AM ) ? "AM" : "PM";
 
-    /*Display Time Format*/
+    /* Display Time, Format: hh:mm:ss [ AM/PM ]*/
+    sprintf( (char * )timeStr, "%s:\t%02d:%02d:%02d [%s]","\nCurrent Time & Date", sTime.Hours, sTime.Minutes, sTime.Seconds, timeFormat );
+    xQueueSend( queueHdl_zOptionsPrint, &timeStr, portMAX_DELAY );
 
+    /* Display Date, Format: Date-Month-Year*/
+    sprintf( ( char * )dateStr, "\t%02d-%02d-%2d\n", sDate.Date, sDate.Month, 2000 + sDate.Year );
+    xQueueSend( queueHdl_zOptionsPrint, &dateStr, portMAX_DELAY );
+}
 
+void RTC_ConfigureTime( RTC_TimeTypeDef *sTime )
+{
+    sTime->TimeFormat = RTC_HOURFORMAT12_AM;
+    sTime->DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+    sTime->StoreOperation = RTC_STOREOPERATION_RESET;
+
+    HAL_RTC_SetTime( &hrtc, sTime, RTC_FORMAT_BIN );
+}
+
+void RTC_ConfigureDate( RTC_DateTypeDef *sDate )
+{
+    HAL_RTC_SetDate( &hrtc, sDate, RTC_FORMAT_BIN );
+}
+
+int RTC_VaildateRTCInformation( RTC_TimeTypeDef *sTime, RTC_DateTypeDef *sDate )
+{
+    if( sTime )
+    {
+        if( ( sTime->Hours > 12 ) || ( sTime->Minutes > 59 ) || ( sTime->Seconds > 59 ) )
+        {
+            return 0;
+        }
+    }
+    if( sDate )
+    {
+        if( ( sDate->Date > 31 ) || ( sDate->WeekDay > 7 ) || ( sDate->Year > 99 ) || ( sDate->Month > 12 ) )
+        {
+            return 0;
+        }
+    }
+
+    return 1;
 }
 
 /* USER CODE END 1 */
